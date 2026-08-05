@@ -198,15 +198,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-        dnf install -y rpm-build gcc gcc-gfortran make bash git \
+        dnf install -y rpm-build gcc gcc-gfortran cmake ninja-build bash git \
           ocl-icd-devel opencl-headers
 
     - name: Install LIBXS
       run: |
         git clone --depth 1 https://github.com/hfp/libxs.git ../libxs
-        cd ../libxs && make -j $(nproc) GNU=1 STATIC=0
-        cd ../libxs && make install PREFIX=/usr STATIC=0 \
-          POUTDIR=lib64 PPKGDIR=lib64/pkgconfig PCMKDIR=lib64/cmake/libxs
+        cd ../libxs && mkdir build && cd build
+        cmake .. -GNinja && ninja install -j $(nproc)
         ldconfig
 
     - name: Build RPM package
